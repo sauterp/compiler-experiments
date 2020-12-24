@@ -1,0 +1,11 @@
+/[ \t]/		{ /* Skip blanks and tabs. */ }
+/[0-9]+/	{ lval.n, _ = strconv.ParseFloat(yylex.Text(), 64); return NUM }
+/[+*\/^n\n-]/	{ return int(yylex.Text()[0]) }
+/./		{ fmt.Println("unrecognized: ", yylex.Text()) }
+//
+package main
+
+import (
+	"strconv"
+	"fmt"
+)
