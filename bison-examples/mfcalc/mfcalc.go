@@ -1,19 +1,30 @@
 package main
 
+import (
+	"os"
+	"fmt"
+	"math"
+	"strings"
+)
+
+type Value struct {
+	Var     float64
+	Func ScalarValuedScalarFunction
+}
+
 // SymRec is a data type for links in the chain of symbols.
 type SymRec struct {
-	Name  *byte /* name of symbol                     */
+	Name  string
 	Type  int   /* type of symbol: either VAR or FNCT */
-	Value struct {
-		Var     float64
-		FnctPtr *func() float64
-	}
+	Value Value
 	Next *SymRec
 }
 
+type ScalarValuedScalarFunction func(float64) float64
+
 func main() {
 	InitTable()
-	yyparse()
+	yyParse(NewLexerWithInit(os.Stdin, func(y *Lexer) { }))
 }
 
 /* Called by yyparse on error */
@@ -23,29 +34,28 @@ func yyerror(s string) {
 
 type Init struct {
 	FName string
-	Fnct  *func() float64
+	Func  ScalarValuedScalarFunction
 }
 
-var ArithFncts = []Init{
-	{"sin", sin},
-	{"cos", cos},
-	{"atan", atan},
-	{"ln", log},
-	{"exp", exp},
-	{"sqrt", sqrt},
-	{0, 0},
+var ArithFunc = []Init{
+	{"sin", math.Sin},
+	{"cos", math.Cos},
+	{"atan", math.Atan},
+	{"ln", math.Log},
+	{"exp", math.Exp},
+	{"sqrt", math.Sqrt},
+	{"", nil},
 }
 
 /* The symbol table: a chain of `struct SymRec'.  */
-var SymRec *SymTable
+var symTable *SymRec
 
 //InitTable puts arithmetic functions in table.
 func InitTable() {
-	var i int
 	var ptr *SymRec
-	for i := 0; ArithFncts[i].FName != 0; i++ {
-		ptr = PutSym(ArithFncts[i].FName, FNCT)
-		ptr.value.fnctptr = ArithFncts[i].fnct
+	for i := 0; ArithFunc[i].FName != ""; i++ {
+		ptr = PutSym(ArithFunc[i].FName, FNCT)
+		ptr.Value.Func = ArithFunc[i].Func
 	}
 }
 
@@ -63,7 +73,7 @@ func PutSym(SymName string, SymType int) *SymRec {
 func GetSym(SymName string) *SymRec {
 	var ptr *SymRec
 	for ptr = symTable; ptr != nil; ptr = ptr.Next {
-		if strings.Compare(ptr.name, SymName) == 0 {
+		if strings.Compare(ptr.Name, SymName) == 0 {
 			return ptr
 		}
 	}

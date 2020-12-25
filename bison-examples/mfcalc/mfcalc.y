@@ -1,14 +1,14 @@
 %{
 	package main
 	import (
+		"fmt"
 		"math"
 	)
-#include "calc.h"  /* Contains definition of `symrec'        */
 %}
 
 %union {
-	double     val;  /* For returning numbers.                   */
-	symrec  *tptr;   /* For returning symbol-table pointers      */
+	val float64  /* For returning numbers.                   */
+	tptr *SymRec   /* For returning symbol-table pointers      */
 }
 
 %token <val>  NUM        /* Simple double precision number   */
@@ -31,20 +31,20 @@ input:   /* empty */
 
 line:
           '\n'
-        | exp '\n'   { printf ("\t%.10g\n", $1); }
-        | error '\n' { yyerrok;                  }
+        | exp '\n'   { fmt.Printf ("\t%.10g\n", $1); }
+        | error '\n' { fmt.Println("yyerrok")                  }
 ;
 
 exp:      NUM                { $$ = $1;                         }
-        | VAR                { $$ = $1->value.var;              }
-        | VAR '=' exp        { $$ = $3; $1->value.var = $3;     }
-        | FNCT '(' exp ')'   { $$ = (*($1->value.fnctptr))($3); }
+        | VAR                { $$ = $1.Value.Var;              }
+        | VAR '=' exp        { $$ = $3; $1.Value.Var = $3;     }
+        | FNCT '(' exp ')'   { $$ = $1.Value.Func($3); }
         | exp '+' exp        { $$ = $1 + $3;                    }
         | exp '-' exp        { $$ = $1 - $3;                    }
         | exp '*' exp        { $$ = $1 * $3;                    }
         | exp '/' exp        { $$ = $1 / $3;                    }
         | '-' exp  %prec NEG { $$ = -$2;                        }
-        | exp '^' exp        { $$ = pow ($1, $3);               }
+        | exp '^' exp        { $$ = math.Pow($1, $3);               }
         | '(' exp ')'        { $$ = $2;                         }
 ;
 /* End of grammar */
