@@ -7,13 +7,13 @@
 %}
 
 %union {
-	val float64  /* For returning numbers.                   */
-	tptr *SymRec   /* For returning symbol-table pointers      */
+	Val float64  /* For returning numbers.                   */
+	Tptr *SymRec   /* For returning symbol-table pointers      */
 }
 
-%token <val>  NUM        /* Simple double precision number   */
-%token <tptr> VAR FNCT   /* Variable and Function            */
-%type  <val>  exp
+%token <Val>  NUM        /* Simple double precision number   */
+%token <Tptr> VAR FNCT   /* Variable and Function            */
+%type  <Val>  exp
 
 %right '='
 %left '-' '+'
@@ -36,8 +36,18 @@ line:
 ;
 
 exp:      NUM                { $$ = $1;                         }
-        | VAR                { $$ = $1.Value.Var;              }
-        | VAR '=' exp        { $$ = $3; $1.Value.Var = $3;     }
+        | VAR                { 
+				s := GetSym($1.Name);
+fmt.Printf("%+v\n", s)
+				$$ = s.Value.Var
+              }
+        | VAR '=' exp        { s := GetSym($1.Name)
+				if s == nil {
+					s = PutSym($1.Name, VAR)
+				}
+				s.Value.Var = $3
+fmt.Printf("%+v\n", s)
+				$$ = s.Value.Var }
         | FNCT '(' exp ')'   { $$ = $1.Value.Func($3); }
         | exp '+' exp        { $$ = $1 + $3;                    }
         | exp '-' exp        { $$ = $1 - $3;                    }

@@ -73,6 +73,8 @@ func PutSym(SymName string, SymType int) *SymRec {
 func GetSym(SymName string) *SymRec {
 	var ptr *SymRec
 	for ptr = symTable; ptr != nil; ptr = ptr.Next {
+		fmt.Println("ptr.Name: ", ptr.Name)
+		fmt.Println("SymName: ", SymName)
 		if strings.Compare(ptr.Name, SymName) == 0 {
 			return ptr
 		}

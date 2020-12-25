@@ -1,6 +1,8 @@
 /[ \t]/		{ /* Skip blanks and tabs. */ }
-/[0-9]+/	{ lval.val, _ = strconv.ParseFloat(yylex.Text(), 64); return NUM }
-/[+*\/^n\n-]/	{ return int(yylex.Text()[0]) }
+/[0-9]+/	{ lval.Val, _ = strconv.ParseFloat(yylex.Text(), 64); return NUM }
+/sin|cos|atan|ln|exp|sqrt/ {  return FNCT }
+/[a-z]/ { lval.Tptr = PutSym(yylex.Text(), VAR); return VAR }
+/[+\(\)*\/^\n=-]/	{ return int(yylex.Text()[0]) }
 /./		{ fmt.Println("unrecognized: ", yylex.Text()) }
 //
 package main
