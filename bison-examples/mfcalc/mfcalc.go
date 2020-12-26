@@ -60,24 +60,27 @@ func InitTable() {
 }
 
 func PutSym(SymName string, SymType int) *SymRec {
-	var ptr *SymRec
-	ptr = new(SymRec)
-	ptr.Name = SymName
-	ptr.Type = SymType
-	ptr.Value.Var = 0 /* set value to 0 even if fctn.  */
-	ptr.Next = symTable
+	ptr := &SymRec {
+		Name : SymName,
+		Type : SymType,
+		Next : symTable,
+	}
 	symTable = ptr
 	return ptr
 }
 
 func GetSym(SymName string) *SymRec {
-	var ptr *SymRec
-	for ptr = symTable; ptr != nil; ptr = ptr.Next {
-		fmt.Println("ptr.Name: ", ptr.Name)
-		fmt.Println("SymName: ", SymName)
+	for ptr := symTable; ptr != nil; ptr = ptr.Next {
 		if strings.Compare(ptr.Name, SymName) == 0 {
 			return ptr
 		}
 	}
 	return nil
 }
+
+func PrintSymTable() {
+	for ptr := symTable; ptr != nil; ptr = ptr.Next {
+		fmt.Printf("%+v\n", *ptr)
+	}
+}
+	

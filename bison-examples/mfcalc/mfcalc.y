@@ -38,7 +38,6 @@ line:
 exp:      NUM                { $$ = $1;                         }
         | VAR                { 
 				s := GetSym($1.Name);
-fmt.Printf("%+v\n", s)
 				$$ = s.Value.Var
               }
         | VAR '=' exp        { s := GetSym($1.Name)
@@ -46,7 +45,6 @@ fmt.Printf("%+v\n", s)
 					s = PutSym($1.Name, VAR)
 				}
 				s.Value.Var = $3
-fmt.Printf("%+v\n", s)
 				$$ = s.Value.Var }
         | FNCT '(' exp ')'   { $$ = $1.Value.Func($3); }
         | exp '+' exp        { $$ = $1 + $3;                    }

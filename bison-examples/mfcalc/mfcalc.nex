@@ -1,7 +1,7 @@
 /[ \t]/		{ /* Skip blanks and tabs. */ }
 /[0-9]+/	{ lval.Val, _ = strconv.ParseFloat(yylex.Text(), 64); return NUM }
-/sin|cos|atan|ln|exp|sqrt/ {  return FNCT }
-/[a-z]/ { lval.Tptr = PutSym(yylex.Text(), VAR); return VAR }
+/sin|cos|atan|ln|exp|sqrt/ { lval.Tptr = GetSym(yylex.Text()); return FNCT }
+/[a-z]/ { lval.Tptr = &SymRec{ Name : yylex.Text() }; return VAR }
 /[+\(\)*\/^\n=-]/	{ return int(yylex.Text()[0]) }
 /./		{ fmt.Println("unrecognized: ", yylex.Text()) }
 //
